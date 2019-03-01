@@ -22,28 +22,30 @@ type Query struct {
 func (q *Query) Execute() (string, error) {
 	command, ok := commands[strings.ToLower(q.Name)]
 	if ok {
-		return command.Run(q)
+		return command.run(q)
 	}
 	return "", errors.New("Command not found")
 }
 
 // Command that evaluates scraped web
-type Command struct {
-	Run func(*Query) (string, error)
+type Command interface {
+	run(*Query) (string, error)
+	info() string
 }
 
 // each available command mapped
 var commands = map[string]Command{
-	"count": Command{Run: Count},
-	"has":   Command{Run: Has},
+	"count": new(Count),
 }
 
 //
-// TOP COMMAND FUNCTIONS
+// COMMANDS
 //
 
-// Count arg occurence on web scrape
-func Count(q *Query) (string, error) {
+// Count arg sum occurence on web scrape
+type Count struct{}
+
+func (c *Count) run(q *Query) (string, error) {
 	textBody, err := scraper.BodyText(q.Site)
 	if err != nil {
 		return "", err
@@ -52,7 +54,6 @@ func Count(q *Query) (string, error) {
 	return strconv.Itoa(result), nil
 }
 
-// Has arg on scrape, breaks and returns if true
-func Has(q *Query) (string, error) {
-	return "70", nil
+func (c *Count) info() string {
+	return "sum occurence on web scrape"
 }

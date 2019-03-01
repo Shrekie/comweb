@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestGetBodyText(t *testing.T) {
+func TestBodyText(t *testing.T) {
 	site := "google.com"
 	textBody, err := BodyText(site)
 	if err != nil {
