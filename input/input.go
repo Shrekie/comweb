@@ -46,7 +46,8 @@ func (s *Splitter) new(a []string) error {
 	return nil
 }
 
-// Resulter formats data before represented by portrayer
+// Resulter executes command and
+// formats data before represented by portrayer
 type Resulter interface {
 	Serve(Potrayer, error) (string, error)
 	new(*command.Query)

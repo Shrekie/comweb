@@ -20,11 +20,14 @@ func (t *fakePrinter) express(r string, e error) (string, error) {
 	return r, e
 }
 
-func TestLineOutput(t *testing.T) {
+func TestCountLine(t *testing.T) {
 	args, err := New(&fakeStream{}, &Splitter{}, &Line{})
+	if err != nil {
+		t.Errorf("Could not construct query")
+	}
 	result, err := args.Serve(&fakePrinter{}, err)
 	if err != nil {
-		t.Errorf("could not select and run command")
+		t.Errorf("Could not serve or execute query")
 	}
 	count, err := strconv.Atoi(result)
 	if err != nil {
