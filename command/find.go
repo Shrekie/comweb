@@ -19,7 +19,9 @@ func Pair(v []string) (Query, error) {
 
 	if len(v) != 3 && len(v) != 4 {
 		query, err = new(Site), errors.New("invalid arguments")
+		return query, err
 	}
+
 	if len(v) == 4 {
 		query, err = new(Site), nil
 	}
