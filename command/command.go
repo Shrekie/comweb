@@ -7,53 +7,55 @@ import (
 	"strings"
 )
 
-// Query to run a command
-// command to match the query and
-// site to target and optional argument
-type Query struct {
-	Name string
-	Arg  string
-	Site string
-}
-
-// Execute command from query
-// finds matching name key in command map
-// and executes the run function
-func (q *Query) Execute() (string, error) {
-	command, ok := commands[strings.ToLower(q.Name)]
-	if ok {
-		return command.run(q)
-	}
-	return "", errors.New("Command not found")
-}
-
-// Command that evaluates scraped web
+// Command is a command callable on program
 type Command interface {
-	run(*Query) (string, error)
+	run(Query, map[string]string) (string, error)
 	info() string
 }
 
-// each available command mapped
-var commands = map[string]Command{
-	"count": new(Count),
-}
-
-//
-// COMMANDS
-//
-
-// Count arg sum occurence on web scrape
+// Count arg sum occurence
 type Count struct{}
 
-func (c *Count) run(q *Query) (string, error) {
-	textBody, err := scraper.BodyText(q.Site)
+func (c *Count) run(q Query, data map[string]string) (string, error) {
+	textBody, err := scraper.BodyText(data["site"])
 	if err != nil {
 		return "", err
 	}
-	result := strings.Count(textBody, q.Arg)
+	result := strings.Count(textBody, data["arg"])
 	return strconv.Itoa(result), nil
 }
 
 func (c *Count) info() string {
-	return "sum occurence on web scrape"
+	return "Count arg sum occurence"
+}
+
+// Has given argument on site
+type Has struct{}
+
+func (c *Has) run(q Query, data map[string]string) (string, error) {
+	textBody, err := scraper.BodyText(data["site"])
+	if err != nil {
+		return "", err
+	}
+	result := strings.Count(textBody, data["arg"])
+	return strconv.FormatBool(result > 0), nil
+}
+
+func (c *Has) info() string {
+	return "Has given argument on site"
+}
+
+// Info about a given command
+type Info struct{}
+
+func (c *Info) run(q Query, data map[string]string) (string, error) {
+	command, ok := commands[strings.ToLower(data["arg"])]
+	if !ok {
+		return "", errors.New("Command not found")
+	}
+	return command.info(), nil
+}
+
+func (c *Info) info() string {
+	return "Gives you info about commands"
 }

@@ -3,6 +3,14 @@ package main
 import "github.com/shrekie/comweb/input"
 
 func main() {
-	args, err := input.New(&input.OsStream{}, &input.Splitter{}, &input.Line{})
+
+	system := &input.Input{
+		Channel:     &input.OsChannel{},
+		Destructure: &input.Splitter{},
+		Envoy:       &input.Line{}}
+
+	args, err := system.Transmit()
+
 	args.Serve(&input.TermPrinter{}, err)
+
 }

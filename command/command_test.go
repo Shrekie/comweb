@@ -6,8 +6,9 @@ import (
 )
 
 func TestCountCommand(t *testing.T) {
-	query := &Query{Name: "count", Arg: "google", Site: "google.com"}
-	executed, err := query.Execute()
+	query := new(Site)
+	query.set([]string{"", "count", "google", "google.com"})
+	executed, err := Execute(query)
 	if err != nil {
 		t.Error("could not execute query")
 	}
