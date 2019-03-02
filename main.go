@@ -1,8 +1,7 @@
 package main
 
-import "github.com/shrekie/comweb/menu"
+import "github.com/shrekie/comweb/input"
 
 func main() {
-	bufferInput := new(menu.BufferInput)
-	menu.Select(bufferInput)
+	input.Convey(new(input.OSStream), new(input.Line)).Serve(new(input.TermPrinter))
 }
