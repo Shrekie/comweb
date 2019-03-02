@@ -42,7 +42,7 @@ func (s *OSStream) process(a Argumenter) Argumenter {
 
 // Resulter formats data before represented by portrayer
 type Resulter interface {
-	Serve(Potrayer)
+	Serve(Potrayer) (string, error)
 	new(*command.Query)
 }
 
@@ -52,9 +52,9 @@ type Line struct {
 }
 
 // Serve as line
-func (r *Line) Serve(p Potrayer) {
-	result, _ := r.Query.Execute()
-	p.express(fmt.Sprintf("%s \n", result))
+func (r *Line) Serve(p Potrayer) (string, error) {
+	result, err := r.Query.Execute()
+	return p.express(fmt.Sprintf("%s \n", result), err)
 }
 
 func (r *Line) new(q *command.Query) {
@@ -63,14 +63,18 @@ func (r *Line) new(q *command.Query) {
 
 // Potrayer is a way to show formatted string
 type Potrayer interface {
-	express(string)
+	express(string, error) (string, error)
 }
 
 // TermPrinter print on terminal
 type TermPrinter struct{}
 
-func (t *TermPrinter) express(r string) {
+func (t *TermPrinter) express(r string, e error) (string, error) {
+	if e != nil {
+		return "ERROR PROCESSING COMMAND", e
+	}
 	fmt.Print(r)
+	return r, e
 }
 
 // Convey a stream in a splitting result

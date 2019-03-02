@@ -5,17 +5,23 @@ import (
 	"testing"
 )
 
-var fakeSlice = [3]string{"count", "google", "google.com"}
+var fakeInput = []string{"count", "google", "google.com"}
 
-type termArguments struct{}
+type fakeStream struct{}
 
-func (i *termArguments) Slice() (string, string, string) {
-	return fakeSlice[0], fakeSlice[1], fakeSlice[2]
+func (s *fakeStream) process(a Argumenter) Argumenter {
+	a.new(fakeInput)
+	return a
 }
 
-func TestInput(t *testing.T) {
-	input := new(termArguments)
-	selected, err := Convey(input)
+type fakePrinter struct{}
+
+func (t *fakePrinter) express(r string, e error) (string, error) {
+	return r
+}
+
+func TestLineOutput(t *testing.T) {
+	selected, err := Convey(new(fakeStream), new(Line)).Serve(new(fakePrinter))
 	if err != nil {
 		t.Errorf("could not select and run command")
 	}
