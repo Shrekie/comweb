@@ -5,29 +5,30 @@ import (
 	"testing"
 )
 
-var fakeInput = []string{"count", "google", "google.com"}
+var fakeInput = []string{"", "count", "google", "google.com"}
 
 type fakeStream struct{}
 
-func (s *fakeStream) process(a Argumenter) Argumenter {
+func (s *fakeStream) process(a Argumenter) (Argumenter, error) {
 	a.new(fakeInput)
-	return a
+	return a, nil
 }
 
 type fakePrinter struct{}
 
 func (t *fakePrinter) express(r string, e error) (string, error) {
-	return r
+	return r, e
 }
 
 func TestLineOutput(t *testing.T) {
-	selected, err := Convey(new(fakeStream), new(Line)).Serve(new(fakePrinter))
+	args, err := New(&fakeStream{}, &Splitter{}, &Line{})
+	result, err := args.Serve(&fakePrinter{}, err)
 	if err != nil {
 		t.Errorf("could not select and run command")
 	}
-	count, err := strconv.Atoi(selected)
+	count, err := strconv.Atoi(result)
 	if err != nil {
-		t.Errorf("could not convert to integer")
+		t.Errorf("could not convert %s to integer", result)
 	}
 	response := count > 0
 	if !response {

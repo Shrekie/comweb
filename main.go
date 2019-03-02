@@ -3,5 +3,6 @@ package main
 import "github.com/shrekie/comweb/input"
 
 func main() {
-	input.Convey(new(input.OSStream), new(input.Line)).Serve(new(input.TermPrinter))
+	result, err := input.New(&input.OsStream{}, &input.Splitter{}, &input.Line{})
+	result.Serve(&input.TermPrinter{}, err)
 }
